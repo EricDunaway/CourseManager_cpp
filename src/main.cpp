@@ -6,7 +6,9 @@
 
 using json = nlohmann::json;
 
+/// Used for JSON Serialization
 namespace nlohmann {
+    /// Course Serializer
     void to_json(json &j, const Course& course) {
         j = json{
                 {"id", course.get_id()},
@@ -15,7 +17,8 @@ namespace nlohmann {
         };
     };
 
-    template <typename T>
+    template <typename T>/// Serialize shared_ptr<T>
+    /// @attention nullptr returns as JS null
     struct adl_serializer<std::shared_ptr<T>> {
         static void to_json(json& j, const std::shared_ptr<T>& opt) {
             if (opt.get()) {
@@ -36,12 +39,17 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 int main()
 #endif
 {
+    // create course manager and add a course
     auto cm = CourseManager();
     cm.add_course(string("**Course Injected by C++**",26), 0);
+
+    // Create webview
     webview::webview w(true, nullptr);
+    // Style Window
     w.set_title(std::string ("Example",7));
     w.set_size(350, 420, WEBVIEW_HINT_NONE);
     w.set_size(350, 420, WEBVIEW_HINT_MIN);
+    // Bind lambdas to js functions in webview
     w.bind("get_courses", [&cm]([[maybe_unused]]const string& s) -> string {
         json j = cm.list_courses();
         return to_string(j);
@@ -52,6 +60,7 @@ int main()
         json j = cm.add_course(title,capacity);
         return to_string(j);
     });
+    // Navigate to page served from local host
     w.navigate(std::string("http://localhost:3000"));
     w.run();
     return 0;

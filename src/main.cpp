@@ -3,6 +3,9 @@
 #include "../external/json.hpp"
 #include "managers/CourseManager.h"
 #include <string>
+#include <cmrc/cmrc.hpp>
+
+CMRC_DECLARE(html);
 
 using json = nlohmann::json;
 
@@ -15,7 +18,7 @@ namespace nlohmann {
                 {"title", course.title},
                 {"capacity", course.get_capacity()}
         };
-    };
+    }
 
     template <typename T>/// Serialize shared_ptr<T>
     /// @attention nullptr returns as JS null
@@ -43,6 +46,10 @@ int main()
     auto cm = CourseManager();
     cm.add_course(string("**Course Injected by C++**",26), 0);
 
+    auto fs = cmrc::html::get_filesystem();
+    auto data = fs.open("index.html");
+    auto html_page = "data:text/html," + webview::url_encode(string(data.begin(),data.end()));
+
     // Create webview
     webview::webview w(true, nullptr);
     // Style Window
@@ -61,7 +68,7 @@ int main()
         return to_string(j);
     });
     // Navigate to page served from local host
-    w.navigate(std::string("http://localhost:3000"));
+    w.navigate( html_page);
     w.run();
     return 0;
 }

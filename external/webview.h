@@ -1102,12 +1102,9 @@ namespace webview {
                                          url_encode("<html><body>Hello</body></html>"));
                 return;
             }
-            std::string html = html_from_uri(url);
-            if (html != "") {
-                browser_engine::navigate("data:text/html," + url_encode(html));
-            } else {
-                browser_engine::navigate(url);
-            }
+            // Sting was being url decoded then re url encoded removed redundant code
+            browser_engine::navigate(url);
+
         }
 
         using binding_t = std::function<void(std::string, std::string, void *)>;
